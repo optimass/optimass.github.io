@@ -82,12 +82,12 @@ analytics:
 author:
   name             : "Optimass"
   avatar           : "massimo.jpg"
-  bio              : "PhD student at MILA, currently focusing on Continual Learning"
+  bio              : "PhD student at MILA and research intern at ElementAI. Currently focusing on Continual Learning"
   location         : "Montréal, QC, Canada"
   employer         :
-  pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
+  pubmed           : 
   googlescholar    : "https://scholar.google.com/citations?user=WaE4GicAAAAJ&hl"
-  email            :
+  email            : "massimo.p.caccia@gmail.com"
   researchgate     :  # example: "https://www.researchgate.net/profile/yourprofile"
   uri              :
   bitbucket        :
@@ -103,7 +103,7 @@ author:
   impactstory      : #"https://profiles.impactstory.org/u/xxxx-xxxx-xxxx-xxxx"
   lastfm           :
   linkedin         :
-  orcid            : "http://orcid.org/yourorcidurl"
+  orcid            : 
   pinterest        :
   soundcloud       :
   stackoverflow    : # http://stackoverflow.com/users/123456/username
