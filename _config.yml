@@ -57,7 +57,7 @@ yandex_site_verification :
 
 # Social Sharing
 twitter:
-  username               : &twitter
+  username               : MassCaccia
 facebook:
   username               :
   app_id                 :
@@ -82,7 +82,7 @@ analytics:
 author:
   name             : "Optimass"
   avatar           : "massimo.jpg"
-  bio              : "Your biography for the left-hand sidebar"
+  bio              : "PhD student at MILA, currently focusing on Continual Learning"
   location         : "Montréal, QC, Canada"
   employer         :
   pubmed           : "https://www.ncbi.nlm.nih.gov/pubmed/?term=john+snow"
