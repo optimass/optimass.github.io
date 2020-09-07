@@ -8,4 +8,4 @@ redirect_from:
   - /about.html
 ---
 
-Short bio
+SITE UNDER CONSTRUCTION
