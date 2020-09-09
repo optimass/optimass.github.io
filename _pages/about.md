@@ -21,9 +21,9 @@ I'm currently working on Continual Reinforcement Learning, which I believe to be
 
 * **06/2020** Our work on [online continual compression](https://arxiv.org/abs/1911.08019) lead by [my brother](https://www.cs.mcgill.ca/~lpagec/) was accepted ICML 2020!
 
-* **06/2020** My work on [Language GANs Falling Short](https://arxiv.org/abs/1811.02549) was accepted ICLR 2020! You can find a 5-min video summary [here](https://iclr.cc/virtual_2020/poster_BJgza6VtPB.html)
+* **12/2019** My work on [Language GANs Falling Short](https://arxiv.org/abs/1811.02549) was accepted ICLR 2020! You can find a 5-min video summary [here](https://iclr.cc/virtual_2020/poster_BJgza6VtPB.html)
 
-* **06/2020** My work on [Online Continual learning with Maximal Interfered Retrieval](http://papers.nips.cc/paper/9357-online-continual-learning-with-maximal-interfered-retrieval) was accepted NeurIPS 2019!
+* **09/2019** My work on [Online Continual learning with Maximal Interfered Retrieval](http://papers.nips.cc/paper/9357-online-continual-learning-with-maximal-interfered-retrieval) was accepted NeurIPS 2019!
 
 
 
