@@ -19,6 +19,8 @@ I'm currently working on Continual Reinforcement Learning, which I believe to be
 
 * **08/2020** I gave [a talk](https://youtu.be/AHGiF21WZbw) on our new approach to continual-learning evaluation towards real-life deployment of continual-learning systems [(OSAKA)](https://arxiv.org/abs/2003.05856) at [ContinualAI](https://www.continualai.org/)
 
+* **07/2020** I hosted a panel with Chelsea Finn, Chris Kanan and Subutai Ahmad at our Continual Learning workshop at CVPR 2020! You can find it [here](https://www.youtube.com/watch?v=sp3Y9Np25Og&t)
+
 * **06/2020** Our work on [online continual compression](https://arxiv.org/abs/1911.08019) lead by [my brother](https://www.cs.mcgill.ca/~lpagec/) was accepted ICML 2020!
 
 * **12/2019** My work on [Language GANs Falling Short](https://arxiv.org/abs/1811.02549) was accepted ICLR 2020! You can find a 5-min video summary [here](https://iclr.cc/virtual_2020/poster_BJgza6VtPB.html)
