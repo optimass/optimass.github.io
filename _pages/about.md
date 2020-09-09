@@ -23,7 +23,7 @@ I'm currently working on Continual Reinforcement Learning, which I believe to be
 
 * **12/2019** My work on [Language GANs Falling Short](https://arxiv.org/abs/1811.02549) was accepted ICLR 2020! You can find a 5-min video summary [here](https://iclr.cc/virtual_2020/poster_BJgza6VtPB.html)
 
-* **09/2019** My work on [Online Continual learning with Maximal Interfered Retrieval](http://papers.nips.cc/paper/9357-online-continual-learning-with-maximal-interfered-retrieval) was accepted NeurIPS 2019!
+* **09/2019** My work on [Online Continual learning with Maximal Interfered Retrieval](http://papers.nips.cc/paper/9357-online-continual-learning-with-maximal-interfered-retrieval) was accepted NeurIPS 2019! You can find a 8-min video summary [here](https://www.youtube.com/watch?v=wfb9UV_n8jg&t)
 
 
 
