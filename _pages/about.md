@@ -17,9 +17,9 @@ I'm currently working on Continual Reinforcement Learning, which I believe to be
 
 # News
 
-* **09/2020** My work proposing a new approach to continual learning (OSAKA) as been accepted at NeurIPS 2020! You can find the arxiv version [here](https://arxiv.org/abs/2003.05856)
+* **09/2020** My work proposing a new approach to continual learning [(OSAKA)]((https://arxiv.org/abs/2003.05856) as been accepted at NeurIPS 2020! 
 
-* **09/2020** Our work proposing a synthetic dataset generator (Synbols) to probe different learning algorithms as been accepted at NeurIPS 2020! You can find the arxiv version [here](https://arxiv.org/abs/2009.06415)
+* **09/2020** Our work proposing a synthetic dataset generator [(Synbols)](https://arxiv.org/abs/2009.06415) to probe different learning algorithms as been accepted at NeurIPS 2020!
 
 * **08/2020** I gave [a talk](https://youtu.be/AHGiF21WZbw) on our new approach to continual-learning evaluation towards real-life deployment of continual-learning systems [(OSAKA)](https://arxiv.org/abs/2003.05856) at [ContinualAI](https://www.continualai.org/)
 
