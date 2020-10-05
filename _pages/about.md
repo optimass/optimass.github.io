@@ -12,7 +12,7 @@ I'm a 4th year PhD student at the Quebec Artificial Intelligence Institute [(Mil
 
 I'm interested in algorithms able to accumulate transferable knowledge or skills enabling generalization to future tasks. Accordingly, my research topics lies in continual learning and meta-learning. My [recent work](https://arxiv.org/abs/2003.05856) proposes a new and more realistic approach to continual learning at the intersection of both fields.
 
-Recently, I have developed a particular interested for the idea of *composing existing skills to learn new skills quickly*. I believe this is the real appeal of continual learning and that it can propel reinforcement learning. Consequently, i'm currently focused on continual RL.
+Recently, I have developed a particular interested for the idea of *composing existing skills to learn new ones quickly*. I believe this is the real appeal of continual learning and that it can propel reinforcement learning. Consequently, i'm currently focused on continual RL.
 
 
 # News
