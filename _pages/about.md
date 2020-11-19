@@ -10,9 +10,10 @@ redirect_from:
 
 I'm a 4th year PhD student at the Quebec Artificial Intelligence Institute [(Mila)](https://mila.quebec/) and an intern at [ElementAI](https://www.elementai.com/) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/) and [Pau Rodriguez](https://prlz77.github.io/), respectively.
 
-I'm interested in algorithms able to accumulate transferable knowledge or skills enabling generalization to future tasks. Accordingly, my research topics lies in continual learning and meta-learning. My [recent work](https://arxiv.org/abs/2003.05856) proposes a new and more realistic approach to continual learning at the intersection of both fields.
+I'm interested in algorithms able to accumulate transferable knowledge or skills enabling generalization to future tasks. Accordingly, my research topics lie in continual learning and meta-learning. My [recent work](https://arxiv.org/abs/2003.05856) proposes a new and more realistic approach to continual learning at the intersection of both fields.
 
-Recently, I have developed a particular interest for the idea of *composing existing skills to learn new ones quickly*. I believe this is the real appeal of continual learning and that it can propel reinforcement learning. Consequently, i'm currently focused on continual RL.
+Recently, I have developed a particular interest in the idea of *composing existing skills to learn new ones quickly*. I believe this is the real appeal of continual learning and that it can propel reinforcement learning. Consequently, i'm currently focused on continual RL.
+
 
 
 # News
