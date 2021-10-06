@@ -19,7 +19,7 @@ I am a fifth-year Ph.D. student at the Quebec Artificial Intelligence Institute 
 
 I’m interested in algorithms able to accumulate transferable knowledge or skills enabling better and faster generalization to future tasks. Accordingly, my research topics lie in continual learning and meta-learning. Recently, I have developed a particular interest in the idea of *composing existing skills to learn new ones quickly*. I believe this to be the natural appeal of continual learning as it can allow curriculum learning to deliver on its promises, as well as propel reinforcement learning and robotics forward. I'm thus currently focusing on continual RL problems.
 
-Also, checkout our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia) as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
+Also, checkout our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia), as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
 
 
 # News
