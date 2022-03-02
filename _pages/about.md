@@ -7,15 +7,8 @@ redirect_from:
   - /about/
   - /about.html
 ---
-<!-- 
-I'm a 4th year PhD student at the Quebec Artificial Intelligence Institute [(Mila)](https://mila.quebec/) and an intern at [ElementAI](https://www.elementai.com/) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/) and [Pau Rodriguez](https://prlz77.github.io/), respectively. 
 
-I'm interested in algorithms able to accumulate transferable knowledge or skills enabling generalization to future tasks. Accordingly, my research topics lie in continual learning and meta-learning. My [recent work](https://arxiv.org/abs/2003.05856) proposes a new and more realistic approach to continual learning at the intersection of both fields.
-
-Recently, I have developed a particular interest in the idea of *composing existing skills to learn new ones quickly*. I believe this is the real appeal of continual learning and that it can propel reinforcement learning. Consequently, i'm currently focused on continual RL. -->
-
-
-I am a fifth-year Ph.D. student at the Quebec Artificial Intelligence Institute (Mila) and an intern at Amazon Science under  [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/) and [Rasool Fakoor](https://sites.google.com/site/rfakoor), respectively. Formerly, i've interned at [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
+I am a fifth-year Ph.D. student at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/) and soon-to-be intern at [DeepMind](https://deepmind.com/) in the Continual Learning team led by  [Marc'Aurelio Ranzato](https://ranzato.github.io/). Formerly, I've interned at [Amazon](https://www.amazon.ca/), [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
 
 I’m interested in algorithms able to accumulate transferable knowledge or skills enabling better and faster generalization to future tasks. Accordingly, my research topics lie in continual learning and meta-learning. Recently, I have developed a particular interest in the idea of *composing existing skills to learn new ones quickly*. I believe this to be the natural appeal of continual learning as it can allow curriculum learning to deliver on its promises, as well as propel reinforcement learning and robotics forward. I'm thus currently focusing on continual RL problems.
 
