@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-I am a sixth-year Ph.D. student at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). Formerly, I've interned at[DeepMind](https://deepmind.com/) in the Continual Learning team led by  [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
+I am a sixth-year Ph.D. student at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). Formerly, I've interned at [DeepMind](https://deepmind.com/) in the Continual Learning team led by  [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
 
 My research interests lie in algorithms that can accumulate transferable knowledge or skills to improve generalization on future tasks. I have a passion for data and computational efficiency, and have focused my research on continual and meta-learning in vision, language and reinforcement learning.
 
