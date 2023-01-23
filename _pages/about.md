@@ -10,9 +10,9 @@ redirect_from:
 
 I am a sixth-year Ph.D. student at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). Formerly, I've interned at [DeepMind](https://deepmind.com/) in the Continual Learning team led by  [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
 
-My research interests lie in algorithms that can accumulate transferable knowledge or skills to improve generalization on future tasks. I have a passion for data and computational efficiency, and have focused my research on continual and meta-learning in vision, language and reinforcement learning.
+My research interests lie in algorithms that can accumulate transferable knowledge or skills to improve generalization on future tasks. I have a passion for data and computational efficiency, and have focused my research on continual, transfer and meta-learning applied in vision, language and reinforcement learning.
 
-Recently, I have become particularly interested in modularity and large-scale machine learning, as I believe these will be critical for realizing significant advances in artificial intelligence. As a result, my current research focuses on developing and scaling modular approaches for large-scale continual supervised learning and continual reinforcement learning.
+Recently, I have become particularly interested in modularity and large-scale machine learning, as I believe these will be critical for realizing significant advances in artificial intelligence. As a result, my current research focuses on developing and scaling modular approaches in different transfer learning paradigms.
 
 Also, checkout our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia), as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
 
