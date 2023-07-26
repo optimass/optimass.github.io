@@ -19,9 +19,9 @@ Also, checkout our software to unify continual-learning research, [Sequoia](http
 
 # News
 
-* **05/2023** Our work on [task-agnostic continual RL](https://arxiv.org/abs/2205.14495) is accepted at  <ins>CoLLAs 2023</ins>! Checkout the [5-min video summary](https://www.youtube.com/watch?v=T0RYCuECAuw&t). 
+* **07/2023** Our new large-scale continual learning benchmark [Nevis'22](https://arxiv.org/abs/2211.11747) was accepted at <ins>JMLR</ins>! Work done while interning at DeepMind. 
 
-* **12/2022** Checkout our new large-scale continual learning benchmark [Nevis'22](https://arxiv.org/abs/2211.11747), work done while interning at DeepMind. 
+* **05/2023** Our work on [task-agnostic continual RL](https://arxiv.org/abs/2205.14495) is accepted at  <ins>CoLLAs 2023</ins>! Checkout the [5-min video summary](https://www.youtube.com/watch?v=T0RYCuECAuw&t). 
 
 * **12/2021** Our [comparative study of large language models in continual learning](https://openreview.net/forum?id=figzpGMrdD) is accepted at <ins>ICLR 2022</ins>!
 
