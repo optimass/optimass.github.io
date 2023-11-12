@@ -8,18 +8,21 @@ redirect_from:
   - /about.html
 ---
 
-I am a sixth-year Ph.D. student at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the supervision of [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). Formerly, I've interned at [DeepMind](https://deepmind.com/) in the Continual Learning team led by  [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, [ElementAI](https://www.elementai.com/) (now [ServiveNow](https://www.servicenow.com/)) and [Spotify Research](https://research.atspotify.com/). 
+I recently completed my Ph.D. at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the guidance of Professor [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). 
+My academic journey has been marked by collaborations with globally renowned institutions, including [DeepMind](https://deepmind.com/), where I worked within the Continual Learning team led by [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, and now at [ServiveNow](https://www.servicenow.com/) as a visiting researcher. I also had the privilege of contributing to ElementAI before its integration with ServiceNow.
+ 
+At the heart of my research is the development of algorithms proficient in accumulating and transferring knowledge or skills to enhance generalization across varied tasks. 
+My passion for data and computational efficiency has directed my studies into continual, transfer, and meta-learning, with a particular emphasis on applications spanning language, vision, and reinforcement learning.
+ 
+Currently, at ServiceNow, I'm applying these principles by working with pre-trained Large Language Models (LLMs) to create computer task-solving agents. These agents, leveraging the vast knowledge and adaptability of LLMs, aim to navigate and master various computer tasks more efficiently. This work represents an exciting step towards enhancing the capabilities of automated solutions in different sectors.
 
-My research interests lie in algorithms that can accumulate transferable knowledge or skills to improve generalization on future tasks. I have a passion for data and computational efficiency, and have focused my research on continual, transfer and meta-learning applied in vision, language and reinforcement learning.
 
-Recently, I have become particularly interested in modularity and large-scale machine learning, as I believe these will be critical for realizing significant advances in artificial intelligence. As a result, my current research focuses on developing and scaling modular approaches in different transfer learning paradigms.
-
-Also, checkout our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia), as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
+Also, check out our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia), as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
 
 
 # News
 
-* **07/2023** Our new large-scale continual learning benchmark [Nevis'22](https://arxiv.org/abs/2211.11747) was accepted at <ins>JMLR</ins>! Work done while interning at DeepMind. 
+* **07/2023** Our new large-scale continual learning benchmark [Nevis'22](https://jmlr.org/papers/v24/22-1345.html) was accepted at <ins>JMLR</ins>! Work done while interning at DeepMind. 
 
 * **05/2023** Our work on [task-agnostic continual RL](https://arxiv.org/abs/2205.14495) is accepted at  <ins>CoLLAs 2023</ins>! Checkout the [5-min video summary](https://www.youtube.com/watch?v=T0RYCuECAuw&t). 
 
