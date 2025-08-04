@@ -8,16 +8,14 @@ redirect_from:
   - /about.html
 ---
 
-I recently completed my Ph.D. at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under the guidance of Professor [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). 
-My academic journey has been marked by collaborations with globally renowned institutions, including [DeepMind](https://deepmind.com/), where I worked within the Continual Learning team led by [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.ca/) in [Alex Smola](https://alex.smola.org/)'s team, and now at [ServiveNow](https://www.servicenow.com/) as a visiting researcher. I also had the privilege of contributing to ElementAI before its integration with ServiceNow.
- 
-At the heart of my research is the development of algorithms proficient in accumulating and transferring knowledge or skills to enhance generalization across varied tasks. 
-My passion for data and computational efficiency has directed my studies into continual, transfer, and meta-learning, with a particular emphasis on applications spanning language, vision, and reinforcement learning.
- 
-Currently, at ServiceNow, I'm applying these principles by working with pre-trained Large Language Models (LLMs) to create computer task-solving agents. These agents, leveraging the vast knowledge and adaptability of LLMs, aim to navigate and master various computer tasks more efficiently. This work represents an exciting step towards enhancing the capabilities of automated solutions in different sectors.
+I am a Senior Research Scientist at [ServiceNow Research](https://www.servicenow.com/research/), specializing in post-training methods for computer-use agents. I see computer use as the ultimate playground for testing agents, thanks to its ubiquity and diversity. 
+ My research involves conducting large-scale empirical studies to systematically evaluate trade-offs among different approaches and to develop practical know-how, with reinforcement learning being a particular focus.
 
+As a core contributor to the web-agent research library ecosystem, I actively shape evaluation frameworks ([BrowserGym](https://github.com/ServiceNow/BrowserGym), [WorkArena](https://github.com/ServiceNow/WorkArena)) and development platforms ([AgentLab](https://github.com/ServiceNow/AgentLab)). My goal is to bridge foundational research and scalable tools to advance the field.
 
-Also, check out our software to unify continual-learning research, [Sequoia](https://github.com/lebrice/Sequoia), as well as my [continual-learning wiki](https://github.com/optimass/continual_learning_papers).
+Previously, I completed my Ph.D. at the Quebec Artificial Intelligence Institute ([Mila](https://mila.quebec/en/)) under Professor [Laurent Charlin](http://www.cs.toronto.edu/~lcharlin/). During my doctoral studies, I collaborated with [DeepMind](https://deepmind.com/)’s Continual Learning team led by [Marc'Aurelio Ranzato](https://ranzato.github.io/), [Amazon](https://www.amazon.science/)’s team under [Alex Smola](https://alex.smola.org/)'s, and ElementAI prior to its integration with ServiceNow.
+
+My Ph.D. research focused on building agents capable of accumulating and transferring knowledge across tasks, drawing from continual learning, transfer learning, and meta-learning. My work explored applications in language, vision, and reinforcement learning, emphasizing improvements in data and compute efficiency.
 
 
 # News
