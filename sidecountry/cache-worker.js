@@ -1,7 +1,7 @@
-const CACHE = 'sidecountry-physics-2';
+const CACHE = 'sidecountry-flow-3';
 const FILES = [
-  './', './index.html', './styles.css?v=2', './game.js?v=2', './engine.js?v=2',
-  './physics.js?v=2', './world.js?v=2', './riders.js?v=2', './audio.js?v=2',
+  './', './index.html', './styles.css?v=3', './game.js?v=3', './engine.js?v=3',
+  './physics.js?v=3', './world.js?v=3', './riders.js?v=3', './audio.js?v=3',
   './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
   './lib/three.module.js', './lib/rapier.es.js', './lib/THREE-LICENSE.txt', './lib/RAPIER-LICENSE.txt',
   './lib/fonts/dm-sans-normal.woff2', './lib/fonts/dm-serif-display-italic.woff2',

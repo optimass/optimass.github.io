@@ -116,12 +116,12 @@ export class SnowPhysics {
     return result;
   }
 
-  orientTorque(target, stiffness = 18, damping = 3.2) {
+  orientTorque(target, stiffness = 18, damping = 3.2, limit = 12, targetOmega = { x: 0, y: 0, z: 0 }) {
     const current = new THREE.Quaternion().copy(this.body.rotation()), error = target.clone().multiply(current.invert());
     if (error.w < 0) error.set(-error.x, -error.y, -error.z, -error.w);
     const omega = this.body.angvel(), mass = this.rider.mass || 75;
-    const torque = new THREE.Vector3(error.x, error.y, error.z).multiplyScalar(2 * mass * stiffness).addScaledVector(omega, -mass * damping);
-    torque.clampLength(0, mass * 12); this.body.addTorque(torque, true);
+    const torque = new THREE.Vector3(error.x, error.y, error.z).multiplyScalar(2 * mass * stiffness).addScaledVector(omega, -mass * damping).addScaledVector(targetOmega, mass * damping);
+    torque.clampLength(0, mass * limit); this.body.addTorque(torque, true);
   }
 
   step() { this.world.step(); }

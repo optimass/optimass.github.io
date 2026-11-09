@@ -93,7 +93,7 @@ export class MountainWorld {
   setRoute(route) {
     this.clearFeatures(); this.route = route;
     if (route === 'park') {
-      for (let i = 0; i < 22; i++) { const z = 76 + i * 74, x = [-6, 8, 0, -13, 13, 0][i % 6], height = i % 4 === 2 ? 4 : 2.8; this.makeRamp(x, z, 7, 10, height); if (i % 3 !== 2) this.makeRail(x + (x < 0 ? 10 : -10), z + 28, 12 + i % 3 * 2); }
+      for (let i = 0; i < 22; i++) { const z = 76 + i * 74, x = [-6, -6, -6, 0, 6, 0][i % 6], height = i % 4 === 2 ? 3.1 : 2.4; this.makeRamp(x, z, 11, 13, height); if (i % 3 !== 2) this.makeRail(x + (x < 0 ? 10 : -10), z + 28, 12 + i % 3 * 2); }
     } else {
       for (let i = 0; i < 18; i++) { const z = 78 + i * 92, x = [-8, 10, -15, 0, 16, -4][i % 6]; this.makeRamp(x, z, 10, 13, 4.4 + i % 3 * .65, true); if (i % 4 === 0) this.makeRail(x + 13, z + 35, 14); }
     }
@@ -113,7 +113,7 @@ export class MountainWorld {
       const stripe = mesh(new THREE.BoxGeometry(width, .04, .17), this.orange, [x, y + height + .06, lipZ - .23]); this.features.add(stripe);
     }
     this.ramps.push({ x, z, width, length, height, geometry: g });
-    this.makeLanding(x, lipZ + 5, width + 2, natural ? 24 : 19, height * .88);
+    this.makeLanding(x, lipZ + (natural ? 5 : 3.5), width + 4, natural ? 28 : 26, height * .8);
   }
 
   makeLanding(x, z, width, length, height) {

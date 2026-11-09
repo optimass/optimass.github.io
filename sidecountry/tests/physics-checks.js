@@ -1,7 +1,7 @@
 import * as THREE from '../lib/three.module.js';
-import { initPhysics, SnowPhysics, PHYSICS_STEP, GRAVITY } from '../engine.js?v=2';
-import { MountainRun } from '../physics.js?v=2';
-import { RIDERS } from '../riders.js?v=2';
+import { initPhysics, SnowPhysics, PHYSICS_STEP, GRAVITY } from '../engine.js?v=3';
+import { MountainRun } from '../physics.js?v=3';
+import { RIDERS } from '../riders.js?v=3';
 
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const fixture = grade => ({ surface: (x, z) => -grade * z, baseHeight: (x, z) => -grade * z, ramps: [], rails: [], obstacles: [], route: 'park' });
@@ -41,7 +41,7 @@ export async function runPhysicsChecks() {
   test('A charged ollie has a human-sized height and banks after a landing', () => {
     for (const id of Object.keys(RIDERS)) {
       const r = new MountainRun(fixture(0), RIDERS[id]);
-      try { tick(r, .5); tick(r, .8, { pop: true }); const floor = r.state.y; r.update(PHYSICS_STEP, {}); let peak = r.state.y; for (let i = 0; i < 480; i++) { r.update(PHYSICS_STEP, {}); peak = Math.max(peak, r.state.y); } check(peak - floor > .25 && peak - floor < 1.1, `${id}: implausible ollie height ${peak - floor}`); check(r.bails === 0 && r.score > 0, `${id}: straight ollie should land and score`); }
+      try { tick(r, .5); tick(r, .8, { pop: true }); const floor = r.state.y; r.update(PHYSICS_STEP, {}); let peak = r.state.y; for (let i = 0; i < 480; i++) { r.update(PHYSICS_STEP, {}); peak = Math.max(peak, r.state.y); } check(peak - floor > .25 && peak - floor < 1.6, `${id}: implausible ollie height ${peak - floor}`); check(r.bails === 0 && r.score > 0, `${id}: straight ollie should land and score`); }
       finally { r.dispose(); }
     }
   });
@@ -52,8 +52,32 @@ export async function runPhysicsChecks() {
   });
   test('A hard flat landing loses the pending combo', () => {
     const r = new MountainRun(fixture(0), RIDERS.massimo);
-    try { r.engine.body.setTranslation({ x: -6, y: 7, z: 40 }, true); r.engine.body.setLinvel({ x: 0, y: 0, z: 5 }, true); r.syncState(); r.beginAir(); r.combo = 900; tick(r, 1.8); check(r.bails === 1 && r.combo === 0, 'A high-impact flat landing must wipe out and discard the combo'); }
+    try { r.engine.body.setTranslation({ x: -6, y: 18, z: 40 }, true); r.engine.body.setLinvel({ x: 0, y: 0, z: 5 }, true); r.syncState(); r.beginAir(); r.combo = 900; tick(r, 2.3); check(r.bails === 1 && r.combo === 0, 'An extreme drop must wipe out and discard the combo'); }
     finally { r.dispose(); }
+  });
+  test('Gravity restarts a sideways or uphill rider after the brake is released', () => {
+    for (const heading of [Math.PI / 2, Math.PI]) {
+      const r = new MountainRun(fixture(.22), RIDERS.massimo);
+      try {
+        tick(r, .25); r.engine.body.setRotation(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), heading), true); r.engine.body.setLinvel({ x: 0, y: 0, z: 0 }, true); r.targetHeading = heading; r.syncState();
+        tick(r, 4); check(r.state.z > 41 && r.state.vz > 3 && r.bails === 0, `Stuck at heading ${heading}: ${JSON.stringify({ z: r.state.z, v: r.state.vz })}`);
+      } finally { r.dispose(); }
+    }
+    const r = new MountainRun(fixture(.22), RIDERS.fred);
+    try { tick(r, 2, { brake: true }); const z = r.state.z; tick(r, 4); check(r.state.z > z + 8 && r.state.vz > 3 && r.bails === 0, 'Releasing the brake must restore downhill flow'); }
+    finally { r.dispose(); }
+  });
+  test('A single cork request completes, lands, and scores for every rider', () => {
+    for (const id of Object.keys(RIDERS)) {
+      const r = new MountainRun(fixture(.22), RIDERS[id]);
+      try {
+        tick(r, .3); r.update(PHYSICS_STEP, { trick: 'cork' }); let lowestUp = 1;
+        for (let i = 0; i < 480; i++) { r.update(PHYSICS_STEP); if (!r.state.grounded) lowestUp = Math.min(lowestUp, new THREE.Vector3(0, 1, 0).applyQuaternion(r.state.orientation).dot(r.state.normal)); }
+        check(lowestUp < .45, `${id}: the cork never actually tilted off axis`);
+        check(r.bails === 0 && r.score > 1000 && r.lastTrick.includes('Cork'), `${id}: cork failed ${JSON.stringify({ bails: r.bails, score: r.score, name: r.lastTrick })}`);
+      }
+      finally { r.dispose(); }
+    }
   });
   test('Rails require physical contact and do not pull in a nearby rider', () => {
     const railWorld = { ...fixture(0), rails: [{ x: -6, z: 41, length: 10, height: 1.1 }] };

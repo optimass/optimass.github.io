@@ -1,17 +1,18 @@
 import * as THREE from './lib/three.module.js';
-import { MountainWorld, groundHeight, RUN_LENGTH } from './world.js?v=2';
-import { RIDERS, portrait, RiderModel } from './riders.js?v=2';
-import { MountainRun } from './physics.js?v=2';
-import { MountainAudio } from './audio.js?v=2';
-import { initPhysics } from './engine.js?v=2';
+import { MountainWorld, groundHeight, RUN_LENGTH } from './world.js?v=3';
+import { RIDERS, portrait, RiderModel } from './riders.js?v=3';
+import { MountainRun } from './physics.js?v=3';
+import { MountainAudio } from './audio.js?v=3';
+import { initPhysics } from './engine.js?v=3';
 
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const format = n => Math.round(n).toLocaleString('en-US');
 const audio = new MountainAudio();
 let selectedRider = 'massimo', selectedRoute = 'park', mode = 'menu', renderer, scene, camera, world, rider, run, sun, clock, animationTime = 0, lastHud = 0, announceUntil = 0, trickUntil = 0, cameraShake = 0;
-const keys = new Set(), touch = new Set();
+const keys = new Set(), touch = new Set(), actions = [];
 let controller = false, previousStart = false, previousBack = false, stickCharged = false, controllerPop = false;
+let previousFlip = false, previousCork = false;
 let bests = {};
 try { bests = JSON.parse(localStorage.getItem('sidecountry.records') || '{}') || {}; } catch { bests = {}; }
 const recordKey = () => `physics.${selectedRider}.${selectedRoute}`;
@@ -34,6 +35,7 @@ function handleEvent(name, data = {}) {
   if (name === 'bank') showTrick('POINTS IN THE POCKET', data.name, `+ ${format(data.points)}`, 'banked');
   if (name === 'bail') { rider.update(run.state, animationTime); rider.beginRagdoll?.(run.engine, scene); showTrick('WIN SOME. WIPE OUT SOME.', 'Yard sale.', 'Combo lost. Shake it off.', 'bailed'); world.emitSnow(run.state, 40, true); cameraShake = .5; announce(data.reason); }
   if (name === 'recover') { rider.endRagdoll?.(); announce('Back at your last clean line.'); }
+  if (name === 'unstuck') announce('Back in the fall line. Keep flowing.', 2);
   if (name === 'rail') announce('Locked in. Stay smooth.');
   if (name === 'grind') showTrick('ON THE RAIL', RIDERS[selectedRider].type === 'snowboard' ? 'Boardslide' : 'Ski slide', `+ ${format(data.points)}`);
   if (name === 'finish') finishRun();
@@ -60,16 +62,16 @@ function closeDialogs() { for (const dialog of document.querySelectorAll('dialog
 
 function startRun() {
   if (!renderer) return;
-  closeDialogs(); mode = 'playing'; keys.clear(); touch.clear(); stickCharged = false; controllerPop = false; run.reset(); rider.endRagdoll?.(); world.reset(); cameraShake = 0; cameraFollowHeading = 0;
+  closeDialogs(); mode = 'playing'; keys.clear(); touch.clear(); actions.length = 0; stickCharged = false; controllerPop = false; run.reset(); rider.endRagdoll?.(); world.reset(); cameraShake = 0; cameraFollowHeading = 0;
   $('app').classList.add('is-playing'); $('game-hud').hidden = false; $('hud-portrait').innerHTML = portrait(selectedRider); $('hud-name').textContent = RIDERS[selectedRider].name; $('hud-route').textContent = selectedRoute === 'park' ? 'JUNIPER PARK' : 'THE RIDGELINE'; $('best-score').textContent = `BEST ${format(bests[recordKey()] || 0)}`;
-  showTrick('GRAVITY · GRIP · MOMENTUM', 'Fresh tracks.', ''); announce(controller ? 'Load the right stick. Wind up with the left. Flick to pop.' : 'Gravity sets your speed. Hold Space, wind up, then release.', 6);
-  resize(); const s = run.state; camera.position.set(s.x + 1.2, s.y + 3.6, s.z - 7.5); $('game-canvas').focus({ preventScroll: true });
+  showTrick('FIND YOUR FLOW', 'Fresh tracks.', ''); announce(matchMedia('(pointer:coarse)').matches ? 'Tap CORK to send it. Release steering to ride downhill.' : controller ? 'Flick to pop. Y / △ corks. We’ll help you catch the landing.' : 'Space to pop. C to cork. Release steering to ride downhill.', 5);
+  resize(); const s = run.state; camera.position.set(s.x + .6, s.y + 2.6, s.z - 5.6); $('game-canvas').focus({ preventScroll: true });
   if (audio.enabled) audio.enable(true);
 }
 
-function pause() { if (mode !== 'playing') return; mode = 'paused'; keys.clear(); touch.clear(); run.wasPop = false; run.state.charge = 0; $('pause-modal').showModal(); }
+function pause() { if (mode !== 'playing') return; mode = 'paused'; keys.clear(); touch.clear(); actions.length = 0; run.wasPop = false; run.queuedTrick = null; run.jumpBuffer = 0; run.state.charge = 0; $('pause-modal').showModal(); }
 function resume() { if (mode !== 'paused') return; closeDialogs(); mode = 'playing'; clock.getDelta(); $('game-canvas').focus({ preventScroll: true }); }
-function returnToMenu() { closeDialogs(); mode = 'menu'; keys.clear(); touch.clear(); $('app').classList.remove('is-playing'); $('game-hud').hidden = true; run.reset(); rider.endRagdoll?.(); world.reset(); camera.fov = 54; resize(); }
+function returnToMenu() { closeDialogs(); mode = 'menu'; keys.clear(); touch.clear(); actions.length = 0; $('app').classList.remove('is-playing'); $('game-hud').hidden = true; run.reset(); rider.endRagdoll?.(); world.reset(); camera.fov = 54; resize(); }
 
 function finishRun() {
   mode = 'results'; keys.clear(); touch.clear(); const record = bests[recordKey()] || 0, isRecord = run.score > record;
@@ -78,13 +80,13 @@ function finishRun() {
 }
 
 const guideData = {
-  keyboard: [['Carve · wind up / check rotation', '← → / A D'], ['Tuck · frontflip in the air', '↑ / W'], ['Brake · backflip in the air', '↓ / S'], ['Brake / spread out in the air', 'SHIFT'], ['Load up → ollie', 'Hold SPACE → release'], ['Grab · signature tweak', 'Hold J · Hold K'], ['Pause · restart · help', 'P / ESC · R · H']],
-  controller: [['Carve · wind up / check rotation', 'Left stick ← →'], ['Tuck · brake · flip in the air', 'Left stick ↑ ↓'], ['Load up → ollie', 'Right stick ↓ → flick ↑'], ['Alternate jump', 'Hold A / ✕ → release'], ['Grab · signature tweak', 'LT / L2 · RT / R2'], ['Brake / spread out', 'X / □'], ['Pause · restart', 'Menu / Options · View / Share']],
-  touch: [['Carve · wind up / check rotation', 'Hold ← or →'], ['Load up → ollie', 'Hold POP → release'], ['Control your speed', 'Hold BRAKE'], ['Grab · signature tweak', 'Hold GRAB · Hold TWEAK'], ['Pause · laptop graphics', 'Tap Ⅱ at the top']],
+  keyboard: [['Carve · spin a 180 in the air', '← → / A D'], ['Tuck · frontflip in the air', '↑ / W'], ['Brake · backflip in the air', '↓ / S'], ['Brake', 'SHIFT'], ['Load up → ollie', 'Tap / hold SPACE → release'], ['Send a 180 · flip · cork', 'Q / E · F · C'], ['Grab · signature tweak', 'Hold J · Hold K'], ['Pause · restart · help', 'P / ESC · R · H']],
+  controller: [['Carve · spin a 180 in the air', 'Left stick ← →'], ['Tuck · brake · flip in the air', 'Left stick ↑ ↓'], ['Load up → ollie', 'Right stick ↓ → flick ↑'], ['Alternate jump', 'Hold A / ✕ → release'], ['Send a flip · cork', 'B / ○ · Y / △'], ['Grab · signature tweak', 'LT / L2 · RT / R2'], ['Brake', 'X / □'], ['Pause · restart', 'Menu / Options · View / Share']],
+  touch: [['Carve · release to point downhill', 'Hold ← or →'], ['Load up → ollie', 'Tap / hold POP → release'], ['Send an off-axis rotation', 'Tap CORK'], ['Send a flip · left/right 180', 'Tap FLIP · ↶ / ↷ 180'], ['Control your speed', 'Hold BRAKE'], ['Grab · signature tweak', 'Hold GRAB · Hold TWEAK'], ['Pause · laptop graphics', 'Tap Ⅱ at the top']],
 };
 function guideTab(tab) { for (const b of document.querySelectorAll('[data-guide]')) b.classList.toggle('selected', b.dataset.guide === tab); $('guide-content').innerHTML = guideData[tab].map(([action, button]) => `<div class="guide-row"><span>${action}</span><span>${button}</span></div>`).join(''); }
 let guidePausedGame = false;
-function openGuide() { if ($('guide').open) return; guidePausedGame = mode === 'playing'; if (guidePausedGame) { mode = 'guide'; keys.clear(); touch.clear(); run.wasPop = false; run.state.charge = 0; } guideTab(controller ? 'controller' : matchMedia('(pointer:coarse)').matches ? 'touch' : 'keyboard'); $('guide').showModal(); }
+function openGuide() { if ($('guide').open) return; guidePausedGame = mode === 'playing'; if (guidePausedGame) { mode = 'guide'; keys.clear(); touch.clear(); actions.length = 0; run.queuedTrick = null; run.jumpBuffer = 0; run.wasPop = false; run.state.charge = 0; } guideTab(controller ? 'controller' : matchMedia('(pointer:coarse)').matches ? 'touch' : 'keyboard'); $('guide').showModal(); }
 function restoreAfterGuide() { const resumeGame = guidePausedGame && mode === 'guide'; guidePausedGame = false; if (resumeGame) { mode = 'playing'; $('game-canvas').focus({ preventScroll: true }); } }
 function closeGuide() { $('guide').close(); restoreAfterGuide(); }
 $('guide').addEventListener('close', restoreAfterGuide);
@@ -119,10 +121,12 @@ window.addEventListener('beforeinstallprompt', event => { event.preventDefault()
 $('install-app').addEventListener('click', async () => { if (!installPrompt) return; await installPrompt.prompt(); await installPrompt.userChoice; installPrompt = null; $('install-app').hidden = true; });
 window.addEventListener('appinstalled', () => { $('install-app').hidden = true; });
 
-const gameKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS', 'KeyJ', 'KeyK', 'Space', 'ShiftLeft', 'ShiftRight']);
+const trickKeys = { KeyQ: 'spinLeft', KeyE: 'spinRight', KeyF: 'flip', KeyC: 'cork' };
+const gameKeys = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'KeyA', 'KeyD', 'KeyW', 'KeyS', 'KeyJ', 'KeyK', 'Space', 'ShiftLeft', 'ShiftRight', ...Object.keys(trickKeys)]);
 window.addEventListener('keydown', event => {
   if (mode === 'playing' && gameKeys.has(event.code)) { event.preventDefault(); keys.add(event.code); }
   if (event.repeat) return;
+  if (mode === 'playing' && trickKeys[event.code]) actions.push(trickKeys[event.code]);
   if (event.code === 'KeyP' || event.code === 'Escape' && mode === 'playing') { event.preventDefault(); if (mode === 'playing') pause(); else if (mode === 'paused') resume(); }
   if (event.code === 'KeyR' && mode === 'playing') startRun();
   if (event.code === 'KeyH' && (mode === 'playing' || mode === 'menu')) openGuide();
@@ -135,6 +139,10 @@ for (const button of document.querySelectorAll('[data-touch]')) {
   const release = event => { event.preventDefault(); touch.delete(button.dataset.touch); button.classList.remove('pressed'); };
   button.addEventListener('pointerup', release); button.addEventListener('pointercancel', release); button.addEventListener('lostpointercapture', release);
 }
+for (const button of document.querySelectorAll('[data-trick]')) {
+  button.addEventListener('pointerdown', event => { event.preventDefault(); button.setPointerCapture(event.pointerId); if (mode === 'playing') actions.push(button.dataset.trick); button.classList.add('pressed'); });
+  for (const name of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(name, () => button.classList.remove('pressed'));
+}
 
 function readInput() {
   const pressed = (...codes) => codes.some(code => keys.has(code));
@@ -146,6 +154,8 @@ function readInput() {
     if (!controller) { controller = true; if (mode === 'playing') announce('Controller connected. Right stick = flick to pop.'); }
     const axis = n => Math.abs(gamepad.axes[n] || 0) > .16 ? gamepad.axes[n] : 0, button = n => gamepad.buttons[n]?.pressed || false;
     if (mode === 'playing') { move = clamp(move + axis(0), -1, 1); pitch = clamp(pitch - axis(1), -1, 1); grab ||= button(6) || button(4); tweak ||= button(7) || button(5); brake ||= button(2);
+      if (button(1) && !previousFlip) actions.push('flip');
+      if (button(3) && !previousCork) actions.push('cork');
       if (axis(3) > .35) { stickCharged = true; controllerPop = true; }
       else if (stickCharged && axis(3) < -.25) { controllerPop = false; stickCharged = false; }
       if (stickCharged && axis(3) === 0 && !button(0)) { controllerPop = false; stickCharged = false; }
@@ -153,9 +163,9 @@ function readInput() {
     }
     if (button(9) && !previousStart) { if (mode === 'playing') pause(); else if (mode === 'paused') resume(); else if (mode === 'menu') startRun(); }
     if (button(8) && !previousBack && mode === 'playing') startRun();
-    previousStart = button(9); previousBack = button(8);
-  } else { controller = false; previousStart = false; previousBack = false; stickCharged = false; controllerPop = false; }
-  return { move, pitch, pop, grab, tweak, brake };
+    previousStart = button(9); previousBack = button(8); previousFlip = button(1); previousCork = button(3);
+  } else { controller = false; previousStart = false; previousBack = false; previousFlip = false; previousCork = false; stickCharged = false; controllerPop = false; }
+  return { move, pitch, pop, grab, tweak, brake, trick: mode === 'playing' ? actions.shift() : null };
 }
 
 function resize() {
@@ -168,14 +178,14 @@ new ResizeObserver(resize).observe($('mountain'));
 function updateHud(dt) {
   if (animationTime - lastHud < .045) return; lastHud = animationTime;
   const s = run.state;
-  $('score').textContent = format(run.score); $('speed').textContent = Math.round(s.speed * 3.6); $('charge-fill').style.width = `${s.charge * 100}%`; $('charge-fill').parentElement.classList.toggle('charging', s.charge > 0); $('charge-label').textContent = s.rail ? 'RAIL LOCKED' : s.charge > .8 ? 'READY TO SEND' : 'POP POWER'; $('progress-fill').style.width = `${clamp((s.z - 34) / (RUN_LENGTH - 34) * 100, 0, 100)}%`;
+  $('score').textContent = format(run.score); $('speed').textContent = Math.round(s.speed * 3.6); $('charge-fill').style.width = `${s.charge * 100}%`; $('charge-fill').parentElement.classList.toggle('charging', s.charge > 0); $('charge-label').textContent = s.rail ? 'RAIL LOCKED' : run.queuedTrick ? 'TRICK LOADED' : s.charge > .8 ? 'READY TO SEND' : 'POP POWER'; $('progress-fill').style.width = `${clamp((s.z - 34) / (RUN_LENGTH - 34) * 100, 0, 100)}%`;
   const bars = $('speed-bars').children; for (let i = 0; i < bars.length; i++) bars[i].classList.toggle('on', i < s.speed / 34 * bars.length);
-  if ($('ride-status')) $('ride-status').textContent = s.rail ? 'RAIL BALANCE' : !s.grounded ? 'FLIGHT' : s.switch ? 'SWITCH' : s.grip < .6 ? 'SLIDING' : s.tuck > .1 ? 'TUCKING' : Math.abs(s.steer) > .15 ? 'CARVING' : 'GLIDING';
+  if ($('ride-status')) $('ride-status').textContent = s.rail ? 'RAIL BALANCE' : !s.grounded ? s.catch ? 'CATCHING' : 'FLIGHT' : s.switch ? 'SWITCH' : s.grip < .6 ? 'SLIDING' : s.tuck > .1 ? 'TUCKING' : Math.abs(s.steer) > .15 ? 'CARVING' : 'GLIDING';
   if (s.rail) { $('charge-fill').style.width = `${(s.railBalance + 1) * 50}%`; $('charge-label').textContent = Math.abs(s.railBalance) < .3 ? 'BALANCED' : s.railBalance > 0 ? 'LEAN LEFT' : 'LEAN RIGHT'; }
   if (!s.grounded && !s.rail && s.bailTimer === 0) {
     const rotation = Math.round(Math.abs(s.spin) / Math.PI) * 180, flips = Math.round(Math.abs(s.flip) / (Math.PI * 2));
-    const names = []; if (rotation) names.push(`${s.spin < 0 ? 'BS' : 'FS'} ${rotation}`); if (flips) names.push(s.flip > 0 ? 'Frontflip' : 'Backflip'); if (s.grab && s.tweak) names.push(RIDERS[selectedRider].special); else if (s.grab) names.push(RIDERS[selectedRider].grab); else if (s.tweak) names.push(RIDERS[selectedRider].tweak);
-    showTrick('IN THE AIR · LAND IT TO KEEP IT', names.join(' + ') || 'Air time', `${(run.jumpAir).toFixed(1)}s${run.combo > 0 ? ` · ${format(run.combo)} in the line` : ''}`);
+    const names = []; if (s.airTrickName) names.push(s.airTrickName); else { if (rotation) names.push(`${s.spin < 0 ? 'BS' : 'FS'} ${rotation}`); if (flips) names.push(s.flip > 0 ? 'Frontflip' : 'Backflip'); } if (s.grab && s.tweak) names.push(RIDERS[selectedRider].special); else if (s.grab) names.push(RIDERS[selectedRider].grab); else if (s.tweak) names.push(RIDERS[selectedRider].tweak);
+    showTrick(s.catch ? 'CATCHING THE LANDING' : 'SEND IT · WE’LL HELP YOU CATCH IT', names.join(' + ') || 'Air time', `${(run.jumpAir).toFixed(1)}s${run.combo > 0 ? ` · ${format(run.combo)} in the line` : ''}`);
   } else if (animationTime > trickUntil) $('trick-display').style.opacity = .12;
   if (animationTime > announceUntil) $('announcement').classList.remove('visible');
 }
@@ -189,10 +199,10 @@ function updateCamera(dt) {
     cameraTarget.set(-2 + orbit, groundHeight(0, 34) + 7.8, 19); camera.position.lerp(cameraTarget, 1 - Math.exp(-dt * 2)); cameraLook.set(-5, groundHeight(0, 52) + 1, 60); camera.lookAt(cameraLook);
   } else {
     const delta = Math.atan2(Math.sin(s.travelHeading - cameraFollowHeading), Math.cos(s.travelHeading - cameraFollowHeading)); cameraFollowHeading += delta * (1 - Math.exp(-dt * 2.5));
-    const dx = Math.sin(cameraFollowHeading), dz = Math.cos(cameraFollowHeading), distance = camera.aspect < 1 ? 8.8 : 7.8;
-    cameraTarget.set(s.x - dx * distance + dz * .9, s.y + 3.5, s.z - dz * distance - dx * .9);
+    const dx = Math.sin(cameraFollowHeading), dz = Math.cos(cameraFollowHeading), distance = camera.aspect < 1 ? 6.4 : 5.6;
+    cameraTarget.set(s.x - dx * distance + dz * .65, s.y + 2.6, s.z - dz * distance - dx * .65);
     cameraTarget.y = Math.max(cameraTarget.y, world.surface(cameraTarget.x, cameraTarget.z) + 1.6);
-    camera.position.lerp(cameraTarget, 1 - Math.exp(-dt * 5)); cameraLook.set(s.x + dx * 9, s.y + .8, s.z + dz * 9);
+    camera.position.lerp(cameraTarget, 1 - Math.exp(-dt * 6)); cameraLook.set(s.x + dx * 5, s.y + .85, s.z + dz * 5);
     camera.fov += (60 + Math.min(s.speed * .2, 7) - camera.fov) * (1 - Math.exp(-dt * 2)); camera.updateProjectionMatrix();
     if (cameraShake > .005) { camera.position.x += (Math.random() - .5) * cameraShake; camera.position.y += (Math.random() - .5) * cameraShake * .5; cameraShake *= Math.exp(-dt * 10); }
     camera.lookAt(cameraLook);
@@ -228,7 +238,12 @@ try {
 }
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
-  navigator.serviceWorker.register('./cache-worker.js', { scope: './' }).then(() => navigator.serviceWorker.ready).then(() => { $('offline-status').textContent = 'READY FOR OFFLINE LAPS.'; }).catch(() => { /* The game still runs online or on a local server. */ });
+  const showOfflineReady = () => {
+    const worker = navigator.serviceWorker.controller;
+    if (worker && new URL(worker.scriptURL).searchParams.get('v') === '3') $('offline-status').textContent = 'READY FOR OFFLINE LAPS.';
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', showOfflineReady);
+  navigator.serviceWorker.register('./cache-worker.js?v=3', { scope: './' }).then(() => navigator.serviceWorker.ready).then(showOfflineReady).catch(() => { /* The game still runs online or on a local server. */ });
 }
 
 export { run, world, scene, camera, renderer, mode };
