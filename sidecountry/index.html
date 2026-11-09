@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f4f3eb">
+  <meta name="description" content="A free 3D snowboard and ski game. Ride with Massimo, Benn, Jeece, and Fred B. Find your line, land tricks, and make the mountain yours.">
+  <meta property="og:title" content="Sidecountry — Good days. Great lines.">
+  <meta property="og:description" content="Four friends, two mountains, and a lot of ways down. A free snowboard and ski game you play in your browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://optimass.github.io/sidecountry/">
+  <title>Sidecountry — Good days. Great lines.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232b4037'/%3E%3Cpath d='M8 46 25 17l9 15 7-11 15 25H8Z' fill='%23d5ed75'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <a class="brand" href="./" aria-label="Sidecountry home"><svg viewBox="0 0 48 38" aria-hidden="true"><path d="M3 32 19 5l10 17 7-11 11 21H3Z"/><path d="m13 15 6 9 5-10" class="logo-snow"/></svg><span>sidecountry<span class="brand-dot">®</span></span></a>
+      <div class="header-tag">A MOUNTAIN PLAYGROUND</div>
+      <nav aria-label="Main"><button id="mountain-nav" class="nav-link active">The mountain</button><button id="crew-nav" class="nav-link">The crew</button><button id="guide-nav" class="nav-link">Field guide <span>↗</span></button></nav>
+      <button id="audio-toggle" class="icon-button" aria-label="Enable sound" title="Sound off">♪<span class="sound-slash"></span></button>
+    </header>
+
+    <main>
+      <aside id="menu" class="menu">
+        <div class="eyebrow"><span class="tiny-star">✳</span> NO LIFT TICKET REQUIRED</div>
+        <h1>Good days.<br>Great <span class="serif">lines.</span></h1>
+        <p class="intro">A little fresh snow. A few good friends.<br>And a mountain that’s all yours.</p>
+        <div class="section-label"><span>01 / PICK YOUR PERSON</span><span class="section-note">4 local legends</span></div>
+        <div class="riders" id="riders">
+          <button class="rider-card selected" data-rider="massimo" aria-pressed="true"><div class="portrait" data-portrait="massimo"></div><span class="rider-name">Massimo <span class="selected-tick">↗</span></span><span class="rider-type">Small. Steazy. Snowboard.</span></button>
+          <button class="rider-card" data-rider="benn" aria-pressed="false"><div class="portrait" data-portrait="benn"></div><span class="rider-name">Benn <span class="selected-tick">↗</span></span><span class="rider-type">Tall. Lanky. Snowboard.</span></button>
+          <button class="rider-card" data-rider="jeece" aria-pressed="false"><div class="portrait" data-portrait="jeece"></div><span class="rider-name">Jeece <span class="selected-tick">↗</span></span><span class="rider-type">Skier. Off-duty policeman.</span></button>
+          <button class="rider-card" data-rider="fred" aria-pressed="false"><div class="portrait" data-portrait="fred"></div><span class="rider-name">Fred B <span class="selected-tick">↗</span></span><span class="rider-type">Fireman. Free-heel fanatic.</span></button>
+        </div>
+        <div class="section-label mountain-label"><span>02 / FIND YOUR LINE</span></div>
+        <div class="route-picker" role="group" aria-label="Select trail"><button class="route selected" data-route="park" aria-pressed="true"><span class="trail-diamond">◆</span><span>Juniper Park<small>Jumps, rails & good times</small></span><span class="route-check">✓</span></button><button class="route" data-route="ridge" aria-pressed="false"><span class="trail-diamond double">◆◆</span><span>The Ridgeline<small>Big air. Bigger mountain.</small></span><span class="route-check">✓</span></button></div>
+        <button id="drop-in" class="primary-button"><span>Let’s ride</span><span>↗</span></button>
+        <div class="play-note"><span class="status-dot"></span> FREE TO ROAM <span>Keyboard · Controller · Touch</span></div>
+        <div class="menu-footer">MADE FOR THE LOVE OF THE TURN. <span>EST. 2026</span></div>
+      </aside>
+
+      <section id="mountain" class="mountain" aria-label="Interactive 3D skiing and snowboarding game">
+        <canvas id="game-canvas" tabindex="0" aria-label="Mountain game. Press Space to charge a jump, release to pop. Arrow keys to steer. Press H for help."></canvas>
+        <div class="grain"></div>
+        <div class="mountain-top"><div class="resort-label"><span class="status-dot"></span> THE GOOD SIDE OF WINTER</div><div class="weather"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></svg> −8° <span> / </span> FRESH POWDER</div></div>
+        <div id="scene-label" class="scene-label"><span class="pill">YOUR NEXT GOOD DAY</span><h2>Juniper Park<span>46° 51′ N · 09° 31′ E</span></h2><div class="scene-description">Find a line. Make it yours.</div></div>
+        <div id="rider-preview" class="rider-preview"><span class="preview-line"></span><div><strong>Massimo</strong><small>LOW CENTER. HIGH STYLE.</small></div></div>
+        <div class="mountain-bottom" id="menu-bottom"><div class="mountain-stats"><div><strong>2,480<span>m</span></strong><small>SUMMIT ELEVATION</small></div><div><strong>∞</strong><small>POSSIBLE LINES</small></div></div><button id="quick-guide" class="guide-chip"><span>⌘</span> A quick field guide <span>↗</span></button></div>
+
+        <div id="game-hud" class="game-hud" hidden>
+          <div class="hud-top"><div class="riding-person"><div id="hud-portrait" class="hud-portrait"></div><div><small id="hud-route">JUNIPER PARK</small><strong id="hud-name">Massimo</strong></div></div><div class="score-box"><small>SESSION SCORE</small><strong id="score">0</strong><span id="best-score">BEST 0</span></div><button id="pause-button" class="hud-button" aria-label="Pause game">Ⅱ</button></div>
+          <div class="run-progress"><div id="progress-fill"></div></div>
+          <div id="trick-display" class="trick-display"><span id="trick-caption">MAKE YOUR FIRST LINE</span><strong id="trick-name">Fresh tracks.</strong><div id="trick-score"></div></div>
+          <div id="announcement" class="announcement"></div>
+          <div class="hud-bottom"><div class="speed"><strong id="speed">0</strong><span>KM/H</span><div class="speed-bars" id="speed-bars"></div></div><div class="control-strip"><span><kbd>←</kbd><kbd>→</kbd> carve / spin</span><span><kbd>SPACE</kbd> hold + release to pop</span><span><kbd>J</kbd> grab</span><span><kbd>K</kbd> tweak</span><span><kbd>P</kbd> pause</span></div><div class="charge-wrap"><small id="charge-label">POP POWER</small><div class="charge-meter"><div id="charge-fill"></div></div></div></div>
+          <div id="touch-controls" class="touch-controls"><div class="touch-steer"><button data-touch="left" aria-label="Steer left">←</button><button data-touch="right" aria-label="Steer right">→</button></div><div class="touch-actions"><button data-touch="grab">GRAB</button><button data-touch="tweak">TWEAK</button><button class="touch-pop" data-touch="pop">HOLD<br>TO POP</button></div></div>
+        </div>
+        <div id="load-error" class="load-error" hidden><h2>The mountain needs WebGL.</h2><p>Try a recent Chrome, Firefox, or Safari browser with hardware acceleration enabled.</p></div>
+      </section>
+    </main>
+    <footer class="global-footer"><span>LESS SCROLLING. MORE SHREDDING.</span><span><span class="footer-arrow">↗</span> TAKE THE LONG WAY DOWN</span></footer>
+  </div>
+
+  <dialog id="guide" class="modal guide-modal"><button class="close-modal" aria-label="Close field guide">×</button><div class="eyebrow">A FEW POINTERS BEFORE YOU POINT IT</div><h2>Your mountain.<br><span class="serif">Your rules.</span></h2><p>Find your flow. Link tricks. Land clean to bank your points.</p><div class="guide-tabs"><button class="selected" data-guide="keyboard">Keyboard</button><button data-guide="controller">Controller</button><button data-guide="touch">Touch</button></div><div id="guide-content"></div><div class="guide-tip"><span>✳</span><p><strong>The Skate feeling.</strong> Load up your jump, then flick to pop. Spin in the air, grab for style, and line up your board or skis downhill before landing. Bail and the current combo is gone.</p></div><button id="guide-done" class="primary-button"><span>Got it. Let’s go.</span><span>↗</span></button></dialog>
+  <dialog id="pause-modal" class="modal pause-modal"><div class="eyebrow">TAKE A BREATHER</div><h2>Mountain time.</h2><p>The powder can wait a minute.</p><button id="resume" class="primary-button"><span>Keep riding</span><span>↗</span></button><button id="restart" class="secondary-button">One more from the top</button><button id="back-menu" class="text-button">Back to the crew</button></dialog>
+  <dialog id="results" class="modal results-modal"><div class="eyebrow">THAT WAS A GOOD DAY</div><h2>Nice <span class="serif">line.</span></h2><p id="results-rider"></p><div class="result-score"><small>SESSION SCORE</small><strong id="result-score">0</strong><span id="record-label"></span></div><div class="result-stats"><div><strong id="result-trick">0</strong><small>BEST COMBO</small></div><div><strong id="result-air">0s</strong><small>AIR TIME</small></div><div><strong id="result-bails">0</strong><small>BAILS</small></div></div><button id="ride-again" class="primary-button"><span>Another lap?</span><span>↗</span></button><button id="results-menu" class="text-button">Change rider or mountain</button></dialog>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
