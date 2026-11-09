@@ -11,7 +11,9 @@
   <meta property="og:url" content="https://optimass.github.io/sidecountry/">
   <title>Sidecountry — Good days. Great lines.</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232b4037'/%3E%3Cpath d='M8 46 25 17l9 15 7-11 15 25H8Z' fill='%23d5ed75'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <div id="app">
@@ -37,8 +39,9 @@
         <div class="section-label mountain-label"><span>02 / FIND YOUR LINE</span></div>
         <div class="route-picker" role="group" aria-label="Select trail"><button class="route selected" data-route="park" aria-pressed="true"><span class="trail-diamond">◆</span><span>Juniper Park<small>Jumps, rails & good times</small></span><span class="route-check">✓</span></button><button class="route" data-route="ridge" aria-pressed="false"><span class="trail-diamond double">◆◆</span><span>The Ridgeline<small>Big air. Bigger mountain.</small></span><span class="route-check">✓</span></button></div>
         <button id="drop-in" class="primary-button"><span>Let’s ride</span><span>↗</span></button>
+        <button id="install-app" class="install-button" hidden>Install for offline laps <span>↗</span></button>
         <div class="play-note"><span class="status-dot"></span> FREE TO ROAM <span>Keyboard · Controller · Touch</span></div>
-        <div class="menu-footer">MADE FOR THE LOVE OF THE TURN. <span>EST. 2026</span></div>
+        <div class="menu-footer"><span id="offline-status">RUNS ON YOUR DEVICE.</span><span>EST. 2026</span></div>
       </aside>
 
       <section id="mountain" class="mountain" aria-label="Interactive 3D skiing and snowboarding game">
@@ -54,8 +57,8 @@
           <div class="run-progress"><div id="progress-fill"></div></div>
           <div id="trick-display" class="trick-display"><span id="trick-caption">MAKE YOUR FIRST LINE</span><strong id="trick-name">Fresh tracks.</strong><div id="trick-score"></div></div>
           <div id="announcement" class="announcement"></div>
-          <div class="hud-bottom"><div class="speed"><strong id="speed">0</strong><span>KM/H</span><div class="speed-bars" id="speed-bars"></div></div><div class="control-strip"><span><kbd>←</kbd><kbd>→</kbd> carve / spin</span><span><kbd>SPACE</kbd> hold + release to pop</span><span><kbd>J</kbd> grab</span><span><kbd>K</kbd> tweak</span><span><kbd>P</kbd> pause</span></div><div class="charge-wrap"><small id="charge-label">POP POWER</small><div class="charge-meter"><div id="charge-fill"></div></div></div></div>
-          <div id="touch-controls" class="touch-controls"><div class="touch-steer"><button data-touch="left" aria-label="Steer left">←</button><button data-touch="right" aria-label="Steer right">→</button></div><div class="touch-actions"><button data-touch="grab">GRAB</button><button data-touch="tweak">TWEAK</button><button class="touch-pop" data-touch="pop">HOLD<br>TO POP</button></div></div>
+          <div class="hud-bottom"><div class="speed"><strong id="speed">0</strong><span>KM/H</span><div class="speed-bars" id="speed-bars"></div><small id="ride-status">GLIDING</small></div><div class="control-strip"><span><kbd>←</kbd><kbd>→</kbd> carve / check spin</span><span><kbd>SPACE</kbd> load + pop</span><span><kbd>SHIFT</kbd> brake</span><span><kbd>J</kbd><kbd>K</kbd> grab / tweak</span><span><kbd>P</kbd> pause</span></div><div class="charge-wrap"><small id="charge-label">POP POWER</small><div class="charge-meter"><div id="charge-fill"></div></div></div></div>
+          <div id="touch-controls" class="touch-controls"><div class="touch-steer"><button data-touch="left" aria-label="Steer left">←</button><button data-touch="right" aria-label="Steer right">→</button><button data-touch="brake" class="touch-brake">BRAKE</button></div><div class="touch-actions"><button data-touch="grab">GRAB</button><button data-touch="tweak">TWEAK</button><button class="touch-pop" data-touch="pop">HOLD<br>TO POP</button></div></div>
         </div>
         <div id="load-error" class="load-error" hidden><h2>The mountain needs WebGL.</h2><p>Try a recent Chrome, Firefox, or Safari browser with hardware acceleration enabled.</p></div>
       </section>
@@ -63,9 +66,9 @@
     <footer class="global-footer"><span>LESS SCROLLING. MORE SHREDDING.</span><span><span class="footer-arrow">↗</span> TAKE THE LONG WAY DOWN</span></footer>
   </div>
 
-  <dialog id="guide" class="modal guide-modal"><button class="close-modal" aria-label="Close field guide">×</button><div class="eyebrow">A FEW POINTERS BEFORE YOU POINT IT</div><h2>Your mountain.<br><span class="serif">Your rules.</span></h2><p>Find your flow. Link tricks. Land clean to bank your points.</p><div class="guide-tabs"><button class="selected" data-guide="keyboard">Keyboard</button><button data-guide="controller">Controller</button><button data-guide="touch">Touch</button></div><div id="guide-content"></div><div class="guide-tip"><span>✳</span><p><strong>The Skate feeling.</strong> Load up your jump, then flick to pop. Spin in the air, grab for style, and line up your board or skis downhill before landing. Bail and the current combo is gone.</p></div><button id="guide-done" class="primary-button"><span>Got it. Let’s go.</span><span>↗</span></button></dialog>
-  <dialog id="pause-modal" class="modal pause-modal"><div class="eyebrow">TAKE A BREATHER</div><h2>Mountain time.</h2><p>The powder can wait a minute.</p><button id="resume" class="primary-button"><span>Keep riding</span><span>↗</span></button><button id="restart" class="secondary-button">One more from the top</button><button id="back-menu" class="text-button">Back to the crew</button></dialog>
+  <dialog id="guide" class="modal guide-modal"><button class="close-modal" aria-label="Close field guide">×</button><div class="eyebrow">A FEW POINTERS BEFORE YOU POINT IT</div><h2>Your mountain.<br><span class="serif">Your rules.</span></h2><p>Gravity sets your speed. Your edges set the line.</p><div class="guide-tabs"><button class="selected" data-guide="keyboard">Keyboard</button><button data-guide="controller">Controller</button><button data-guide="touch">Touch</button></div><div id="guide-content"></div><div class="guide-tip"><span>✳</span><p><strong>Load. Wind up. Commit.</strong> Hold pop and steer to preload a spin, then release pop. Rotation keeps going: steer the opposite way to check it. A grab tucks your body and speeds up rotation. Land with your feet under you and your gear along your momentum. A flat landing hits harder than a downslope. Hold brake to scrub speed.</p></div><button id="guide-done" class="primary-button"><span>Got it. Let’s go.</span><span>↗</span></button></dialog>
+  <dialog id="pause-modal" class="modal pause-modal"><div class="eyebrow">TAKE A BREATHER</div><h2>Mountain time.</h2><p>The powder can wait a minute.</p><label class="graphics-setting" for="graphics-select"><span>Graphics<small>Physics stays the same at every setting.</small></span><select id="graphics-select"><option value="auto">Automatic</option><option value="laptop">Laptop / battery</option><option value="high">High detail</option></select></label><button id="resume" class="primary-button"><span>Keep riding</span><span>↗</span></button><button id="restart" class="secondary-button">One more from the top</button><button id="back-menu" class="text-button">Back to the crew</button></dialog>
   <dialog id="results" class="modal results-modal"><div class="eyebrow">THAT WAS A GOOD DAY</div><h2>Nice <span class="serif">line.</span></h2><p id="results-rider"></p><div class="result-score"><small>SESSION SCORE</small><strong id="result-score">0</strong><span id="record-label"></span></div><div class="result-stats"><div><strong id="result-trick">0</strong><small>BEST COMBO</small></div><div><strong id="result-air">0s</strong><small>AIR TIME</small></div><div><strong id="result-bails">0</strong><small>BAILS</small></div></div><button id="ride-again" class="primary-button"><span>Another lap?</span><span>↗</span></button><button id="results-menu" class="text-button">Change rider or mountain</button></dialog>
-  <script type="module" src="game.js"></script>
+  <script type="module" src="game.js?v=2"></script>
 </body>
 </html>

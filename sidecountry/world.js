@@ -3,7 +3,7 @@ import * as THREE from './lib/three.module.js';
 export const RUN_LENGTH = 1800;
 export function groundHeight(x, z) {
   const side = Math.max(0, Math.abs(x) - 37);
-  return 64 - z * .125 + Math.sin(z * .025) * 1.25 + Math.cos(x * .055) * .8 + side * side * .0035 + Math.sin(z * .013 + x * .032) * Math.min(side * .04, 3);
+  return 64 - z * .225 + Math.sin(z * .025) * 1.25 + Math.cos(x * .055) * .8 + side * side * .0035 + Math.sin(z * .013 + x * .032) * Math.min(side * .04, 3);
 }
 
 function random(seed) { let n = seed; return () => { n = (n * 1664525 + 1013904223) >>> 0; return n / 4294967296; }; }
@@ -12,8 +12,8 @@ function mesh(geometry, material, pos, shadow = true) { const m = new THREE.Mesh
 
 export class MountainWorld {
   constructor(scene) {
-    this.scene = scene; this.features = new THREE.Group(); this.scene.add(this.features); this.ramps = []; this.rails = []; this.obstacles = []; this.tracks = []; this.route = 'park';
-    this.snowMat = mat(0xf3f5ee); this.orange = mat(0xd8784e); this.dark = mat(0x344e43); this.wood = mat(0x927757);
+    this.scene = scene; this.features = new THREE.Group(); this.scene.add(this.features); this.ramps = []; this.landings = []; this.rails = []; this.obstacles = []; this.tracks = []; this.route = 'park'; this.collisionTrees = []; this.collisionRocks = []; this.baseHeight = groundHeight;
+    this.snowMat = new THREE.MeshStandardMaterial({ color: 0xf3f5ee, roughness: .88 }); this.orange = mat(0xd8784e); this.dark = mat(0x344e43); this.wood = mat(0x927757);
     this.buildSky(); this.buildTerrain(); this.buildTrees(); this.buildRocks(); this.buildLift(); this.buildLodge(); this.buildBackdrop(); this.setRoute('park'); this.buildParticles(); this.buildTracks();
   }
 
@@ -27,7 +27,11 @@ export class MountainWorld {
     const geometry = new THREE.PlaneGeometry(520, RUN_LENGTH + 600, 80, 280); geometry.rotateX(-Math.PI / 2); geometry.translate(0, 0, RUN_LENGTH / 2 + 100);
     const p = geometry.attributes.position, colors = [], rng = random(6);
     for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i); p.setY(i, groundHeight(x, z)); const n = rng() * .03, c = new THREE.Color().setRGB(.88 + n, .93 + n * .7, .91 + n * .8); colors.push(c.r, c.g, c.b); }
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); geometry.computeVertexNormals(); const terrain = mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true }), null, false); terrain.receiveShadow = true; this.scene.add(terrain);
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3)); geometry.computeVertexNormals();
+    const textureCanvas = document.createElement('canvas'); textureCanvas.width = textureCanvas.height = 256; const ctx = textureCanvas.getContext('2d'), noise = ctx.createImageData(256, 256);
+    for (let i = 0; i < noise.data.length; i += 4) { const value = 125 + Math.floor(rng() * 34); noise.data.set([value, value, value, 255], i); } ctx.putImageData(noise, 0, 0);
+    const grain = new THREE.CanvasTexture(textureCanvas); grain.wrapS = grain.wrapT = THREE.RepeatWrapping; grain.repeat.set(100, 460); grain.anisotropy = 4;
+    const terrain = mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .91, bumpMap: grain, bumpScale: .018 }), null, false); terrain.receiveShadow = true; this.terrain = terrain; this.scene.add(terrain);
     const lineMat = new THREE.LineBasicMaterial({ color: 0x74867f, transparent: true, opacity: .13 });
     for (let j = 0; j < 7; j++) { const points = []; for (let z = -50; z < RUN_LENGTH; z += 8) { const x = -28 + j * 9 + Math.sin(z * .031 + j) * 2.7; points.push(new THREE.Vector3(x, groundHeight(x, z) + .025, z)); } this.scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), lineMat)); }
   }
@@ -36,8 +40,9 @@ export class MountainWorld {
     const rng = random(235), positions = [];
     for (let i = 0; i < 580; i++) { const z = -120 + rng() * (RUN_LENGTH + 440), side = rng() > .5 ? 1 : -1, x = side * (24 + rng() * 145); positions.push({ x, z, h: 3.2 + rng() * 5.4, s: .7 + rng() * .7 }); }
     for (let i = 0; i < 20; i++) { const z = 155 + i * 80, x = (i % 2 ? -1 : 1) * (15 + rng() * 10); positions.push({ x, z, h: 4.2 + rng() * 2, s: .8 }); this.obstacles.push({ x, z, radius: .75 }); }
+    this.collisionTrees = positions.filter(p => Math.abs(p.x) < 150).map(p => ({ x: p.x, z: p.z, y: groundHeight(p.x, p.z), h: p.h * .6, radius: .22 }));
     const count = positions.length, trunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.11, .2, 1, 5), this.wood, count), greens = [], snows = [], dummy = new THREE.Object3D();
-    for (let j = 0; j < 3; j++) { greens.push(new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 6), mat([0x3b5d50, 0x446657, 0x507263][j]), count)); snows.push(new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 6), this.snowMat, count)); }
+    for (let j = 0; j < 3; j++) { greens.push(new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 10), new THREE.MeshStandardMaterial({ color: [0x2a5141, 0x3e6350, 0x4f705b][j], roughness: .98 }), count)); snows.push(new THREE.InstancedMesh(new THREE.ConeGeometry(1, 1, 10), this.snowMat, count)); }
     positions.forEach((p, i) => { const y = groundHeight(p.x, p.z); dummy.position.set(p.x, y + .55, p.z); dummy.scale.set(1, 1.1, 1); dummy.updateMatrix(); trunks.setMatrixAt(i, dummy.matrix);
       for (let j = 0; j < 3; j++) { const radius = p.h * (.24 - j * .038) * p.s, h = p.h * .5; dummy.rotation.y = i * 1.2; dummy.position.set(p.x, y + p.h * (.32 + j * .21), p.z); dummy.scale.set(radius, h, radius); dummy.updateMatrix(); greens[j].setMatrixAt(i, dummy.matrix); dummy.position.y += h * .125; dummy.scale.set(radius * .78, h * .83, radius * .78); dummy.updateMatrix(); snows[j].setMatrixAt(i, dummy.matrix); }
     });
@@ -46,7 +51,7 @@ export class MountainWorld {
 
   buildRocks() {
     const rng = random(9823), g = new THREE.IcosahedronGeometry(1, 0), stone = mat(0x84928c);
-    for (let i = 0; i < 80; i++) { const x = (rng() > .5 ? 1 : -1) * (32 + rng() * 75), z = rng() * (RUN_LENGTH + 100), h = 1 + rng() * 4; const rock = mesh(g, stone, [x, groundHeight(x, z), z]); rock.scale.set(h * 1.5, h, h); rock.rotation.y = rng() * 6; this.scene.add(rock); const snow = mesh(g, this.snowMat, [x, groundHeight(x, z) + h * .4, z]); snow.scale.set(h * 1.45, h * .65, h * .9); snow.rotation.y = rock.rotation.y; this.scene.add(snow); }
+    for (let i = 0; i < 80; i++) { const x = (rng() > .5 ? 1 : -1) * (32 + rng() * 75), z = rng() * (RUN_LENGTH + 100), h = 1 + rng() * 4; const rock = mesh(g, stone, [x, groundHeight(x, z), z]); rock.scale.set(h * 1.5, h, h); rock.rotation.y = rng() * 6; this.scene.add(rock); const snow = mesh(g, this.snowMat, [x, groundHeight(x, z) + h * .4, z]); snow.scale.set(h * 1.45, h * .65, h * .9); snow.rotation.y = rock.rotation.y; this.scene.add(snow); this.collisionRocks.push({ x, y: groundHeight(x, z), z, radius: h * .85 }); }
   }
 
   buildLift() {
@@ -73,15 +78,17 @@ export class MountainWorld {
   buildBackdrop() {
     this.backdrop = new THREE.Group(); const rng = random(990);
     for (let i = 0; i < 15; i++) {
-      const x = -600 + i * 90, z = 420 + rng() * 200, h = 55 + rng() * 85, radius = 75 + rng() * 70;
-      const geometry = new THREE.ConeGeometry(radius, h, 5, 4), p = geometry.attributes.position, c = [];
+      const x = -600 + i * 90, z = 420 + rng() * 200, h = 160 + rng() * 140, radius = 110 + rng() * 90;
+      const geometry = new THREE.ConeGeometry(radius, h, 24, 12), p = geometry.attributes.position, c = [];
+      for (let j = 0; j < p.count; j++) { const px = p.getX(j), py = p.getY(j), pz = p.getZ(j), f = 1 + Math.sin(px * .09 + i) * Math.cos(pz * .08) * .14; p.setXYZ(j, px * f, py + Math.sin(px * .06 + pz * .1) * 5 * (1 - Math.abs(py / h)), pz * f); }
+      geometry.computeVertexNormals();
       for (let j = 0; j < p.count; j++) { const y = p.getY(j); if (y < h * .16) { const color = new THREE.Color(i % 2 ? 0x94a6a7 : 0xa1b2b2); c.push(color.r, color.g, color.b); } else { const color = new THREE.Color(0xe6eae3); c.push(color.r, color.g, color.b); } }
-      geometry.setAttribute('color', new THREE.Float32BufferAttribute(c, 3)); const mountain = mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 1, fog: false }), [x, -45 + h / 2, z], false); mountain.rotation.y = rng() * Math.PI; mountain.scale.z = .7; this.backdrop.add(mountain);
+      geometry.setAttribute('color', new THREE.Float32BufferAttribute(c, 3)); const mountain = mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, fog: false }), [x, -z * .225 - 35 + h / 2, z], false); mountain.rotation.y = rng() * Math.PI; mountain.scale.z = .7; this.backdrop.add(mountain);
     }
     this.scene.add(this.backdrop);
   }
 
-  clearFeatures() { this.features.traverse(o => { if (o.isMesh) { o.geometry.dispose(); for (const m of Array.isArray(o.material) ? o.material : [o.material]) { if (![this.snowMat, this.orange, this.dark, this.wood].includes(m)) { m.map?.dispose(); m.dispose(); } } } }); this.features.clear(); this.ramps = []; this.rails = []; }
+  clearFeatures() { this.features.traverse(o => { if (o.isMesh) { o.geometry.dispose(); for (const m of Array.isArray(o.material) ? o.material : [o.material]) { if (![this.snowMat, this.orange, this.dark, this.wood].includes(m)) { m.map?.dispose(); m.dispose(); } } } }); this.features.clear(); this.ramps = []; this.landings = []; this.rails = []; }
 
   setRoute(route) {
     this.clearFeatures(); this.route = route;
@@ -105,18 +112,28 @@ export class MountainWorld {
     if (!natural) { for (const side of [-1, 1]) { const sideG = new THREE.BufferGeometry(); const p = []; for (let i = 0; i <= segments; i++) { const zz = z + i / segments * length, yy = groundHeight(x + side * width / 2, zz); p.push(x + side * width / 2, yy, zz, x + side * width / 2, yy + height * (i / segments) ** 2, zz); } sideG.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); sideG.setIndex(indices); sideG.computeVertexNormals(); const m = this.orange.clone(); m.side = THREE.DoubleSide; this.features.add(mesh(sideG, m, null, false)); }
       const stripe = mesh(new THREE.BoxGeometry(width, .04, .17), this.orange, [x, y + height + .06, lipZ - .23]); this.features.add(stripe);
     }
-    this.ramps.push({ x, z, width, length, height });
+    this.ramps.push({ x, z, width, length, height, geometry: g });
+    this.makeLanding(x, lipZ + 5, width + 2, natural ? 24 : 19, height * .88);
+  }
+
+  makeLanding(x, z, width, length, height) {
+    const vertices = [], indices = [];
+    for (let i = 0; i <= 12; i++) { const t = i / 12, zz = z + t * length; for (const xx of [x - width / 2, x + width / 2]) vertices.push(xx, groundHeight(xx, zz) + height * (1 - t) ** 2 + .025, zz); if (i < 12) { const a = i * 2; indices.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); } }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); g.setIndex(indices); g.computeVertexNormals(); this.features.add(mesh(g, this.snowMat, null, false));
+    this.features.add(mesh(new THREE.BoxGeometry(width, height, .15), this.snowMat, [x, groundHeight(x, z) + height / 2, z]));
+    for (const side of [-1, 1]) { const p = []; for (let i = 0; i <= 12; i++) { const zz = z + i / 12 * length, xx = x + side * width / 2, yy = groundHeight(xx, zz); p.push(xx, yy, zz, xx, yy + height * (1 - i / 12) ** 2, zz); } const sideG = new THREE.BufferGeometry(); sideG.setAttribute('position', new THREE.Float32BufferAttribute(p, 3)); sideG.setIndex(indices); sideG.computeVertexNormals(); const m = this.snowMat.clone(); m.side = THREE.DoubleSide; this.features.add(mesh(sideG, m, null, false)); }
+    this.landings.push({ x, z, width, length, height, geometry: g });
   }
 
   makeRail(x, z, length) {
-    const y = groundHeight(x, z), rail = { x, z, length, height: 1.1 }; this.rails.push(rail);
-    const group = new THREE.Group(); group.position.set(x, y, z); group.rotation.x = .125;
-    const railMat = mat(0xdd885f), top = mesh(new THREE.BoxGeometry(.38, .22, length), railMat, [0, 1.1, length / 2]); group.add(top);
-    for (let i = 0; i <= 2; i++) group.add(mesh(new THREE.BoxGeometry(.13, 1.1, .13), this.dark, [0, .55, length * i / 2])); this.features.add(group);
+    const y = groundHeight(x, z), endY = groundHeight(x, z + length), rail = { x, z, length, height: 1.1 }; this.rails.push(rail);
+    const group = new THREE.Group(), top = mesh(new THREE.BoxGeometry(.38, .22, Math.hypot(length, endY - y)), mat(0x939c98), [x, (y + endY) / 2 + 1.1, z + length / 2]); top.rotation.x = -Math.atan2(endY - y, length); group.add(top);
+    for (let i = 0; i <= 2; i++) group.add(mesh(new THREE.BoxGeometry(.13, 1.1, .13), this.dark, [x, y + (endY - y) * i / 2 + .55, z + length * i / 2])); this.features.add(group);
   }
 
-  surface(x, z) { let y = groundHeight(x, z); for (const r of this.ramps) if (z >= r.z && z <= r.z + r.length && Math.abs(x - r.x) <= r.width / 2) y += r.height * ((z - r.z) / r.length) ** 2; return y; }
+  surface(x, z) { let y = groundHeight(x, z); for (const r of this.ramps) if (z >= r.z && z <= r.z + r.length && Math.abs(x - r.x) <= r.width / 2) y += r.height * ((z - r.z) / r.length) ** 2; for (const l of this.landings) if (z >= l.z && z <= l.z + l.length && Math.abs(x - l.x) <= l.width / 2) y += l.height * (1 - (z - l.z) / l.length) ** 2; return y; }
   rampAt(x, z) { return this.ramps.find(r => z >= r.z && z <= r.z + r.length && Math.abs(x - r.x) <= r.width / 2); }
+  normalAt(x, z) { const e = .1, gx = (groundHeight(x + e, z) - groundHeight(x - e, z)) / (2 * e); let gz = (groundHeight(x, z + e) - groundHeight(x, z - e)) / (2 * e); const r = this.rampAt(x, z); if (r) gz += 2 * r.height * (z - r.z) / (r.length * r.length); const l = this.landings.find(a => z >= a.z && z <= a.z + a.length && Math.abs(x - a.x) <= a.width / 2); if (l) gz -= 2 * l.height * (1 - (z - l.z) / l.length) / l.length; return new THREE.Vector3(-gx, 1, -gz).normalize(); }
 
   buildParticles() {
     this.particleCount = 120; this.particleData = Array.from({ length: this.particleCount }, () => ({ life: 0, x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 })); this.particleCursor = 0; this.particles = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.07, 0), new THREE.MeshBasicMaterial({ color: 0xf8f8ed, transparent: true, opacity: .75 }), this.particleCount); this.particles.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.particles.frustumCulled = false; this.scene.add(this.particles); this.particleDummy = new THREE.Object3D();
@@ -134,8 +151,8 @@ export class MountainWorld {
 
   track(state, isSki) {
     if (!state.grounded || state.bailTimer > 0) { this.lastTrack = null; return; }
-    if (this.lastTrack && state.z - this.lastTrack.z < .45) return;
-    if (this.lastTrack) for (const offset of isSki ? [-.18, .18] : [0]) { const index = this.trackCursor++ % this.trackCapacity, a = this.lastTrack, b = state; this.trackPositions.set([a.x + offset, this.surface(a.x + offset, a.z) + .04, a.z, b.x + offset, this.surface(b.x + offset, b.z) + .04, b.z], index * 6); }
+    if (this.lastTrack && Math.hypot(state.z - this.lastTrack.z, state.x - this.lastTrack.x) < .45) return;
+    if (this.lastTrack) for (const offset of isSki ? [-.18, .18] : [0]) { const index = this.trackCursor++ % this.trackCapacity, a = this.lastTrack, b = state, dx = Math.cos(state.heading) * offset, dz = -Math.sin(state.heading) * offset; this.trackPositions.set([a.x + dx, this.surface(a.x + dx, a.z + dz) + .04, a.z + dz, b.x + dx, this.surface(b.x + dx, b.z + dz) + .04, b.z + dz], index * 6); }
     this.lastTrack = { x: state.x, z: state.z }; this.trackLines.geometry.setDrawRange(0, Math.min(this.trackCursor, this.trackCapacity) * 2); this.trackLines.geometry.attributes.position.needsUpdate = true;
   }
 
